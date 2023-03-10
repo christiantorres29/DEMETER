@@ -4,7 +4,7 @@ from skimage.morphology import disk
 import cv2
 import time
 
-img=cv2.imread("./frame432.png")
+img=cv2.imread("./furrows.png")
 r=cv2.equalizeHist(img[:,:,0])
 g=cv2.equalizeHist(img[:,:,1])
 b=cv2.equalizeHist(img[:,:,2])
