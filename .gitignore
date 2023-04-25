@@ -1,0 +1,9 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+comments/
+/VIDS/
+/.idea/
+/TRAINING/PLANT-CONCRETE/
+/TRAINING/PLANT-GRASS/
+/TRAINING/PLANT-SOIL/
+
