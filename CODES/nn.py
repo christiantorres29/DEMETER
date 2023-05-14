@@ -9,28 +9,34 @@ import cv2
 import glob
 import os
 
-num_classes = len([40,60,70,80,90,100,110,120])
-print(num_classes)
-
 path="/home/christian/Desktop/UNIV/DEMETER/TRAINING/PLANT-CONCRETE-PREP/"
 input_shape = cv2.imread("/home/christian/Desktop/UNIV/DEMETER/TRAINING/PLANT-CONCRETE-PREP/40/0.png").shape[0:2]
+print("image shape: "+str(input_shape))
 
 #create dataset
 batch_size = 128
 
 train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
-    path,
-    labels='inferred',
-    label_mode='int',
+    directory=path,
+    label_mode='categorical',
+    batch_size=batch_size,
     color_mode='grayscale',
+    image_size=input_shape,
     validation_split=0.2,
     subset="both",
-    seed=1337,
-    image_size=input_shape,
-    batch_size=batch_size,
+    seed=42,
 )
+# Print the class names and number of classes
+class_names = train_ds.class_names
+num_classes = len(class_names)
+print("Class names:", class_names)
+print("Number of classes:", num_classes)
 
 input_shape=input_shape+(1,)
+print("input shape: "+str(input_shape))
+
+print("Dataset data :")
+print(train_ds.element_spec)
 
 def make_model(input_shape, num_classes):
     inputs = keras.Input(shape=input_shape)
@@ -76,9 +82,20 @@ def make_model(input_shape, num_classes):
     x = layers.Dropout(0.5)(x)
     outputs = layers.Dense(units, activation=activation)(x)
     return keras.Model(inputs, outputs)
+def make_testmodel(input_shape, num_classes):
+    x = keras.Sequential([
+        layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(64, (3, 3), activation='relu'),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Flatten(),
+        layers.Dense(64, activation='relu'),
+        layers.Flatten(),
+        layers.Dense(num_classes, activation='softmax')
+    ])
+    return x
 
-
-model = make_model(input_shape=input_shape, num_classes=num_classes)
+model = make_testmodel(input_shape=input_shape, num_classes=num_classes)
 keras.utils.plot_model(model, show_shapes=True)
 
 epochs = 25
@@ -87,4 +104,4 @@ callbacks = [keras.callbacks.ModelCheckpoint("save_at_{epoch}.keras")]
 model.compile(optimizer=keras.optimizers.Adam(1e-3),
     loss="binary_crossentropy",
     metrics=["accuracy"],)
-model.fit(train_ds,epochs=epochs,callbacks=callbacks,validation_data=val_ds)
+model.fit(train_ds,epochs=epochs,batch_size=50,callbacks=callbacks,validation_data=val_ds)

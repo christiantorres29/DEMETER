@@ -4,10 +4,10 @@ from skimage.morphology import disk
 import cv2
 import time
 
-img=cv2.imread("./furrows.png")
-r=cv2.equalizeHist(img[:,:,0])
-g=cv2.equalizeHist(img[:,:,1])
-b=cv2.equalizeHist(img[:,:,2])
+img=cv2.imread("/home/christian/Desktop/UNIV/DEMETER/IMG_TEST/crop_sim.png")
+r=(img[:,:,0])
+g=(img[:,:,1])
+b=(img[:,:,2])
 kernel = disk(11)
 kernel2 =disk(1)
 
