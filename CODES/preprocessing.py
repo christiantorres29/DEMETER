@@ -22,11 +22,15 @@ def greenbyCOM(img):
     b=img[:,:,2]#cv2.equalizeHist(img[:,:,2])
 
     T = cv2.add(r.copy(), g.copy(), b.copy())
-    T[T==0]=1
-
-    R=r.copy()/T
-    G=g.copy()/T
-    B=b.copy()/T
+    try:
+        R = r.copy() / T
+        G = g.copy() / T
+        B = b.copy() / T
+    except:
+        T[T==0]=1 # eliminar posibles divisiones por cero
+        R=r.copy()/T
+        G=g.copy()/T
+        B=b.copy()/T
 
     ExG = 2*G-R-B
     ExR = 1.4*R-G
