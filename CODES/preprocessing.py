@@ -21,34 +21,29 @@ def greenbyCOM(img):
     g=img[:,:,1]#cv2.equalizeHist(img[:,:,1])
     b=img[:,:,2]#cv2.equalizeHist(img[:,:,2])
 
-    T = cv2.add(r.copy(), g.copy(), b.copy())
-    try:
-        R = r.copy() / T
-        G = g.copy() / T
-        B = b.copy() / T
-    except:
-        T[T==0]=1 # eliminar posibles divisiones por cero
-        R=r.copy()/T
-        G=g.copy()/T
-        B=b.copy()/T
+    T = img.copy()#cv2.add(r.copy(), g.copy(), b.copy())
+
+    T[T==0]=1 # eliminar posibles divisiones por cero
+
+    R=r.copy()/T
+    G=g.copy()/T
+    B=b.copy()/T
 
     ExG = 2*G-R-B
     ExR = 1.4*R-G
     ExGR = ExG-ExR
     CIVE = 0.441*R-0.811*G + 0.385*G + 18.78745
-    RB=(R**0.667 * B**0.333)
-    try:
-        VEG = G/RB
-    except:
-        RB[RB==0]=1
-        VEG = G/RB
+    RB = np.power(R, 0.667) * np.power(B, 0.333)
 
-    COM = 0.25*ExG+ 0.30*ExGR+ 0.33*CIVE + 0.12*VEG*R
+    RB[RB == 0] = 1
+    VEG = G/RB
 
-    COM=cv2.convertScaleAbs(COM, alpha=35)#255/COM.max()
+    COM = 0.25*ExG + 0.30*ExGR + 0.33*CIVE + 0.12*VEG*R
 
-    blur = cv2.GaussianBlur(COM,(3,3),0)
-    _, thresh = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    COM = cv2.convertScaleAbs(COM, alpha = 35)#255/COM.max()
+
+    blur = cv2.GaussianBlur(COM, (3, 3), 0)
+    _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     return thresh
 
 def greenidfbyHSVDT(img):
